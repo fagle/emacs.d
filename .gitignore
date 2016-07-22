@@ -2,6 +2,7 @@
 /.emacs.desktop
 /auto-save-list
 /.session
+/session.*
 /custom.el
 *.elc
 CVS
@@ -41,3 +42,4 @@ site-lisp/package/
 /recentf
 /viper
 semanticdb/
+/projectile-bookmarks.eld
