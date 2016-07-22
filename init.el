@@ -1,160 +1,168 @@
-(require 'package)
-(add-to-list 'package-archives
-	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
+;;; This file bootstraps the configuration, which is divided into
+;;; a number of other files.
 
-(setq gc-cons-threshold 100000000)
-(setq inhibit-startup-message t)
+(let ((minver "23.3"))
+  (when (version<= emacs-version "23.1")
+    (error "Your Emacs is too old -- this config requires v%s or higher" minver)))
+(when (version<= emacs-version "24")
+  (message "Your Emacs is old, and some functionality in this config will be disabled. Please upgrade if possible."))
 
-(defalias 'yes-or-no-p 'y-or-n-p)
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(require 'init-benchmarking) ;; Measure startup time
 
-(defconst demo-packages
-  '(anzu
-    company
-    duplicate-thing
-    ggtags
-    helm
-    helm-gtags
-    helm-projectile
-    helm-swoop
-    ;; function-args
-    clean-aindent-mode
-    comment-dwim-2
-    dtrt-indent
-    ws-butler
-    iedit
-    yasnippet
-    smartparens
-    projectile
-    volatile-highlights
-    undo-tree
-    zygospore))
+(defconst *spell-check-support-enabled* nil) ;; Enable with t if you prefer
+(defconst *is-a-mac* (eq system-type 'darwin))
 
-(defun install-packages ()
-  "Install all required packages."
-  (interactive)
-  (unless package-archive-contents
-    (package-refresh-contents))
-  (dolist (package demo-packages)
-    (unless (package-installed-p package)
-      (package-install package))))
+;;----------------------------------------------------------------------------
+;; Temporarily reduce garbage collection during startup
+;;----------------------------------------------------------------------------
+(defconst sanityinc/initial-gc-cons-threshold gc-cons-threshold
+  "Initial value of `gc-cons-threshold' at start-up time.")
+(setq gc-cons-threshold (* 128 1024 1024))
+(add-hook 'after-init-hook
+          (lambda () (setq gc-cons-threshold sanityinc/initial-gc-cons-threshold)))
 
-(install-packages)
+;;----------------------------------------------------------------------------
+;; Bootstrap config
+;;----------------------------------------------------------------------------
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(require 'init-compat)
+(require 'init-utils)
+(require 'init-site-lisp) ;; Must come before elpa, as it may provide package.el
+;; Calls (package-initialize)
+(require 'init-elpa)      ;; Machinery for installing required packages
+(require 'init-exec-path) ;; Set up $PATH
 
-;; this variables must be set before load helm-gtags
-;; you can change to any prefix key of your choice
-(setq helm-gtags-prefix-key "\C-cg")
+;;----------------------------------------------------------------------------
+;; Allow users to provide an optional "init-preload-local.el"
+;;----------------------------------------------------------------------------
+(require 'init-preload-local nil t)
 
-(add-to-list 'load-path "~/.emacs.d/custom")
+;;----------------------------------------------------------------------------
+;; Load configs for specific features and modes
+;;----------------------------------------------------------------------------
 
-(require 'setup-helm)
-(require 'setup-helm-gtags)
-;; (require 'setup-ggtags)
-(require 'setup-cedet)
-(require 'setup-editing)
+(require-package 'wgrep)
+(require-package 'project-local-variables)
+(require-package 'diminish)
+(require-package 'scratch)
+(require-package 'mwe-log-commands)
 
-(windmove-default-keybindings)
+(require 'init-frame-hooks)
+(require 'init-xterm)
+(require 'init-themes)
+(require 'init-osx-keys)
+(require 'init-gui-frames)
+(require 'init-dired)
+(require 'init-isearch)
+(require 'init-grep)
+(require 'init-uniquify)
+(require 'init-ibuffer)
+(require 'init-flycheck)
 
-;; function-args
-;; (require 'function-args)
-;; (fa-config-default)
-;; (define-key c-mode-map  [(tab)] 'company-complete)
-;; (define-key c++-mode-map  [(tab)] 'company-complete)
+(require 'init-recentf)
+(require 'init-ido)
+(require 'init-hippie-expand)
+(require 'init-company)
+(require 'init-windows)
+(require 'init-sessions)
+(require 'init-fonts)
+(require 'init-mmm)
 
-;; company
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
-(delete 'company-semantic company-backends)
-(define-key c-mode-map  [(tab)] 'company-complete)
-(define-key c++-mode-map  [(tab)] 'company-complete)
-;; (define-key c-mode-map  [(control tab)] 'company-complete)
-;; (define-key c++-mode-map  [(control tab)] 'company-complete)
+(require 'init-editing-utils)
+(require 'init-whitespace)
+(require 'init-fci)
 
-;; company-c-headers
-(add-to-list 'company-backends 'company-c-headers)
+(require 'init-vc)
+(require 'init-darcs)
+(require 'init-git)
+(require 'init-github)
 
-;; hs-minor-mode for folding source code
-(add-hook 'c-mode-common-hook 'hs-minor-mode)
+(require 'init-projectile)
 
-;; Available C style:
-;; “gnu”: The default style for GNU projects
-;; “k&r”: What Kernighan and Ritchie, the authors of C used in their book
-;; “bsd”: What BSD developers use, aka “Allman style” after Eric Allman.
-;; “whitesmith”: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
-;; “stroustrup”: What Stroustrup, the author of C++ used in his book
-;; “ellemtel”: Popular C++ coding standards as defined by “Programming in C++, Rules and Recommendations,” Erik Nyquist and Mats Henricson, Ellemtel
-;; “linux”: What the Linux developers use for kernel development
-;; “python”: What Python developers use for extension modules
-;; “java”: The default style for java-mode (see below)
-;; “user”: When you want to define your own style
-(setq
- c-default-style "linux" ;; set style to "linux"
- )
+(require 'init-compile)
+(require 'init-crontab)
+(require 'init-textile)
+(require 'init-markdown)
+(require 'init-csv)
+(require 'init-erlang)
+(require 'init-javascript)
+(require 'init-php)
+(require 'init-org)
+(require 'init-nxml)
+(require 'init-html)
+(require 'init-css)
+(require 'init-haml)
+(require 'init-python-mode)
+(unless (version<= emacs-version "24.3")
+  (require 'init-haskell))
+(require 'init-elm)
+(require 'init-ruby-mode)
+(require 'init-rails)
+(require 'init-sql)
 
-(global-set-key (kbd "RET") 'newline-and-indent)  ; automatically indent when press RET
+(require 'init-paredit)
+(require 'init-lisp)
+(require 'init-slime)
+(unless (version<= emacs-version "24.2")
+  (require 'init-clojure)
+  (require 'init-clojure-cider))
+(require 'init-common-lisp)
 
-;; activate whitespace-mode to view all whitespace characters
-(global-set-key (kbd "C-c w") 'whitespace-mode)
+(when *spell-check-support-enabled*
+  (require 'init-spelling))
 
-;; show unncessary whitespace that can mess up your diff
-(add-hook 'prog-mode-hook (lambda () (interactive) (setq show-trailing-whitespace 1)))
+(require 'init-misc)
 
-;; use space to indent by default
-(setq-default indent-tabs-mode nil)
+(require 'init-dash)
+(require 'init-ledger)
+;; Extra packages which don't require any configuration
 
-;; set appearance of a tab that is represented by 4 spaces
-(setq-default tab-width 4)
+(require-package 'gnuplot)
+(require-package 'lua-mode)
+(require-package 'htmlize)
+(require-package 'dsvn)
+(when *is-a-mac*
+  (require-package 'osx-location))
+(require-package 'regex-tool)
 
-;; Compilation
-(global-set-key (kbd "<f5>") (lambda ()
-                               (interactive)
-                               (setq-local compilation-read-command nil)
-                               (call-interactively 'compile)))
+;;----------------------------------------------------------------------------
+;; Allow access from emacsclient
+;;----------------------------------------------------------------------------
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 
-;; setup GDB
-(setq
- ;; use gdb-many-windows by default
- gdb-many-windows t
 
- ;; Non-nil means display source file containing the main routine at startup
- gdb-show-main t
- )
+;;----------------------------------------------------------------------------
+;; Variables configured via the interactive 'customize' interface
+;;----------------------------------------------------------------------------
+(when (file-exists-p custom-file)
+  (load custom-file))
 
-;; Package: clean-aindent-mode
-(require 'clean-aindent-mode)
-(add-hook 'prog-mode-hook 'clean-aindent-mode)
 
-;; Package: dtrt-indent
-(require 'dtrt-indent)
-(dtrt-indent-mode 1)
+;;----------------------------------------------------------------------------
+;; Allow users to provide an optional "init-local" containing personal settings
+;;----------------------------------------------------------------------------
+(when (file-exists-p (expand-file-name "init-local.el" user-emacs-directory))
+  (error "Please move init-local.el to ~/.emacs.d/lisp"))
+(require 'init-local nil t)
 
-;; Package: ws-butler
-(require 'ws-butler)
-(add-hook 'prog-mode-hook 'ws-butler-mode)
 
-;; Package: yasnippet
-(require 'yasnippet)
-(yas-global-mode 1)
+;;----------------------------------------------------------------------------
+;; Locales (setting them earlier in this file doesn't work in X)
+;;----------------------------------------------------------------------------
+(require 'init-locales)
 
-;; Package: smartparens
-(require 'smartparens-config)
-(setq sp-base-key-bindings 'paredit)
-(setq sp-autoskip-closing-pair 'always)
-(setq sp-hybrid-kill-entire-symbol nil)
-(sp-use-paredit-bindings)
+(add-hook 'after-init-hook
+          (lambda ()
+            (message "init completed in %.2fms"
+                     (sanityinc/time-subtract-millis after-init-time before-init-time))))
 
-(show-smartparens-global-mode +1)
-(smartparens-global-mode 1)
 
-;; Package: projejctile
-(require 'projectile)
-(projectile-global-mode)
-(setq projectile-enable-caching t)
+(provide 'init)
 
-(require 'helm-projectile)
-(helm-projectile-on)
-(setq projectile-completion-system 'helm)
-(setq projectile-indexing-method 'alien)
-
-;; Package zygospore
-(global-set-key (kbd "C-x 1") 'zygospore-toggle-delete-other-windows)
+;; Local Variables:
+;; coding: utf-8
+;; no-byte-compile: t
+;; End:
