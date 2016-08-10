@@ -1,6 +1,10 @@
 ;;; Code:
 (require 'helm-gtags)
 (require 'setup-helm)
+(require-package 'cmake-ide)
+(require-package 'function-args)
+(require-package 'helm-gtags)
+
 (setq
  helm-gtags-ignore-case t
  helm-gtags-auto-update t
@@ -76,7 +80,7 @@
 
 ;;(global-linum-mode)
 (setq large-file-warning-threshold 100000000)
-
+(set-default-font "Consolas-12")
 (cmake-ide-setup)
 
 ;;;(add-to-list 'load-path (concat myoptdir "AC"))
