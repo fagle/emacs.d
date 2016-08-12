@@ -29,7 +29,9 @@
 (add-to-list 'package-archives `("melpa" . ,(if (< emacs-major-version 24)
                                                 "http://melpa.org/packages/"
                                               "https://melpa.org/packages/")))
-
+;; for chinese users
+(setq package-archives '(("gnu"   . "http://elpa.zilongshanren.com/gnu/")
+                         ("melpa" . "http://elpa.zilongshanren.com/melpa/")))
 
 
 ;; If gpg cannot be found, signature checking will fail, so we

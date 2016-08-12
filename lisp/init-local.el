@@ -1,9 +1,10 @@
 ;;; Code:
-(require 'helm-gtags)
-(require 'setup-helm)
 (require-package 'cmake-ide)
 (require-package 'function-args)
 (require-package 'helm-gtags)
+
+(require 'helm-gtags)
+(require 'setup-helm)
 
 (setq
  helm-gtags-ignore-case t
