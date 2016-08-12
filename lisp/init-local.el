@@ -2,7 +2,8 @@
 (require-package 'cmake-ide)
 (require-package 'function-args)
 (require-package 'helm-gtags)
-
+(require-package 'helm-swoop)
+(require-package 'helm-projectile)
 (require 'helm-gtags)
 (require 'setup-helm)
 
