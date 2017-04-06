@@ -8,6 +8,17 @@
 (require 'setup-helm)
 
 (setq
+ magit-repository-directories
+ '(("~" . 1)
+   ("~/Projects" . 1)
+   ("~/Projects/External" . 1))
+ exec-path-from-shell-arguments '("-l")
+ org-default-notes-file "~/Documents/org/inbox.org")
+
+
+(require-package 'evil)
+
+(setq
  helm-gtags-ignore-case t
  helm-gtags-auto-update t
  helm-gtags-use-input-at-cursor t
@@ -179,5 +190,6 @@
 ;; (nyan-mode t);;启动nyan-mode
 ;; (nyan-start-animation);;开始舞动吧（会耗cpu资源）
 
+
+
 (provide 'init-local)
-;;; init-local
