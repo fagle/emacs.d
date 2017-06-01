@@ -82,7 +82,7 @@
 
 ;;(global-linum-mode)
 (setq large-file-warning-threshold 100000000)
-(set-default-font "Consolas-12")
+(if (eq system-type 'darwin) (set-default-font "Monaco-12" nil t ) (set-default-font "Consolas-12"))
 (cmake-ide-setup)
 
 ;;;(add-to-list 'load-path (concat myoptdir "AC"))
