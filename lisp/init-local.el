@@ -38,9 +38,9 @@
 
 (setq-default cursor-type 'bar)
 
-(setq indent-tabs-mode nil)
-(setq default-tab-width 4)
-(setq c-basic-offset 4)
+(setq indent-tabs-mode 1)
+(setq default-tab-width 8)
+(setq c-basic-offset 8)
 
 (require 'cc-mode)
 (require 'semantic)
@@ -83,6 +83,10 @@
 ;;(global-linum-mode)
 (setq large-file-warning-threshold 100000000)
 (if (eq system-type 'darwin) (set-default-font "Monaco-12" nil t ) (set-default-font "Consolas-12"))
+
+(when (eq system-type 'windows-nt)
+  (set-default-font "Consolas-12"))
+
 (cmake-ide-setup)
 
 ;;;(add-to-list 'load-path (concat myoptdir "AC"))
