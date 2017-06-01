@@ -14,7 +14,7 @@
 (set-language-environment "UTF-8")
 (prefer-coding-system 'utf-8)
 
-(setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode t)
 (delete-selection-mode)
 (global-set-key (kbd "RET") 'newline-and-indent)
 

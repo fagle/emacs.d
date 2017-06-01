@@ -1,1 +1,0 @@
-("~/.emacs.d/" "/media/sf_MengLegend_Mobile/branches/Rebuild_June/" "/media/sf_MengLegend_Mobile/" "~/emacs-24.5/")
